@@ -8,6 +8,7 @@ import java.io.File;
 import hackasaurusrex.netnight.MainActivity;
 
 /**
+ * Sends an email to an email client selected by the user
  * Created by Craig on 02/04/2016.
  */
 public class SendEmail {
@@ -19,22 +20,42 @@ public class SendEmail {
     private File file;
     private Activity activity;
 
-    public SendEmail(String subject, String text, String filename){
+    /**
+     * Creates an object with the needed info to send an email
+     * @param subject The subject line of the email
+     * @param text The body of the email
+     * @param filename The filename of the attachment
+     * @param activity The activity that is calling this function
+     */
+    public SendEmail(String subject, String text, String filename, Activity activity){
         this.subject = subject;
         this.text = text;
-
+        this.activity = activity;
         //TODO Validate file
         file = new File(filename);
     }
 
-    public SendEmail(String filename){
-        this(DEFAULT_SUBJECT, DEFAULT_TEXT, filename);
+    /**
+     * Creates an object with needed info to send an email. Uses default subject and body.
+     * @param filename The filename of attachment
+     * @param activity The activity that is calling this function
+     */
+    public SendEmail(String filename, Activity activity){
+        this(DEFAULT_SUBJECT, DEFAULT_TEXT, filename, activity);
     }
 
+    /**
+     * Sets the text of the email body
+     * @param text The text of the email body
+     */
     public void setText(String text){
         this.text = text;
     }
 
+    /**
+     * Sets the subject line of the email
+     * @param subject The subject of the email
+     */
     public void setSubject(String subject){
         this.subject = subject;
     }
@@ -42,14 +63,14 @@ public class SendEmail {
     /**
      * Sends an email to an email client with the default subject, message body, and file attachment
      *  Sends to the specified recipient email
-     * @param recipientEmail The email address of the recipient
+     * @param recipientEmails The email addresses of the recipients
      */
-    public void sendEmail(String recipientEmail){
+    public void sendEmail(String[] recipientEmails){
         // Set up the email to send
         Intent i = new Intent(Intent.ACTION_SEND, Uri.parse("mailto:"));
         i.setType("message/rfc822");
 
-        i.putExtra(Intent.EXTRA_EMAIL, recipientEmail);
+        i.putExtra(Intent.EXTRA_EMAIL, recipientEmails);
         i.putExtra(Intent.EXTRA_SUBJECT, subject);
         i.putExtra(Intent.EXTRA_TEXT, text);
 
@@ -60,7 +81,7 @@ public class SendEmail {
         try{
             activity.startActivity(Intent.createChooser(i,"Choose an email clien to send from:"));
         } catch (android.content.ActivityNotFoundException e){
-            // TODO notify user that no client installed
+            // Notify user that no client installed
             Toast.makeText(activity, "No email clients found", Toast.LENGTH_LONG).show();
         }
 
